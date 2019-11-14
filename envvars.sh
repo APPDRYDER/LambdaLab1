@@ -43,9 +43,10 @@ export MAVEN_APACHE_DOWNLOAD_MIRROR="apache-mirror.8birdsvideo.com"
 export JAVA_TEST_APP_JAR="JavaApp/target/pkg1-0.0.1-SNAPSHOT-jar-with-dependencies.jar "
 #
 ##############################################################################
-# AppDynamics Java Agent
+# AppDynamics Agents
 #
-export APPDYNAMICS_APP_AGENT_JAR_FILE="AppServerAgent-4.5.15.28231/javaagent.jar"
+export APPDYNAMICS_APPLICATION_AGENT_JAR_FILE="AppServerAgent-4.5.15.28231/javaagent.jar"
+export APPDYNAMICS_MACHINE_AGENT_DIR="MachineAgent"
 #
 ##############################################################################
 # AppDynamics SaaS Controller

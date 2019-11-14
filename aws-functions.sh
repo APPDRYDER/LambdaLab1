@@ -5,22 +5,17 @@
 #
 # Maintainer: David Ryder, david.ryder@appdynamics.com
 #
-# Requires: jq
+# Requires: jq (brew install jq)
 #
 #
 
 ##############################################################
 #
-_awsCreateFunction() {
-  # Required environment varibales
-  #AWS_LAMBDA_FUNCTION_NAME="DDR-TEST-1"
-  #AWS_LAMBDA_RUNTIME="java8"
-  #AWS_LAMBDA_HANDLER="pkg1.Test2"
-  #AWS_LAMBDA_ZIP_FILE="fileb://../Eclipse/Lambda/target/Lambda-0.0.1-SNAPSHOT.jar"
-  _validateEnvironmentVars "AWS Create Function" \
-    "AWS_LAMBDA_FUNCTION_NAME" "AWS_LAMBDA_RUNTIME" "AWS_LAMBDA_HANDLER" "AWS_LAMBDA_ZIP_FILE"
+_awsLambdaCreateFunction() {
+  # Create a AWS Lambda Function
+  _validateEnvironmentVars "AWS Create Lambda Function" \
+    "AWS_LAMBDA_ROLE_NAME" "AWS_LAMBDA_FUNCTION_NAME" "AWS_LAMBDA_RUNTIME" "AWS_LAMBDA_HANDLER" "AWS_LAMBDA_ZIP_FILE"
 
-  AWS_ROLE_NAME="DDR-LAMBDA-1"
   AWS_ROLE_POLICY_DOC_FILE="AWSLambdaBasicExecutionRole.json"
 
   # Create the AWS Role Policy Document File
@@ -31,11 +26,11 @@ _awsCreateFunction() {
               "Principal": { "Service": "lambda.amazonaws.com" } } ] }' > $AWS_ROLE_POLICY_DOC_FILE
 
   # Create the role for lambda functions
-  aws iam create-role --role-name $AWS_ROLE_NAME --assume-role-policy-document fileb://$AWS_ROLE_POLICY_DOC_FILE
+  aws iam create-role --role-name $AWS_LAMBDA_ROLE_NAME --assume-role-policy-document "fileb://$AWS_ROLE_POLICY_DOC_FILE"
 
   # Get the role ARN
-  AWS_ROLE_ARN=`aws iam get-role --role-name $AWS_ROLE_NAME | jq -r '.Role | .Arn'`
-  echo "Role $AWS_ROLE_NAME ARN $AWS_ROLE_ARN"
+  AWS_ROLE_ARN=`aws iam get-role --role-name $AWS_LAMBDA_ROLE_NAME | jq -r '.Role | .Arn'`
+  echo "Role $AWS_LAMBDA_ROLE_NAME ARN $AWS_ROLE_ARN"
 
   # List functions: name, runtime, handler
   aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler}  ]'
@@ -48,8 +43,9 @@ _awsCreateFunction() {
     --timeout 30 \
     --publish \
     --handler $AWS_LAMBDA_HANDLER \
-    --zip-file $AWS_LAMBDA_ZIP_FILE
+    --zip-file "fileb://$AWS_LAMBDA_ZIP_FILE"
 
+  # Get the function ARN
   AWS_FUNCTION_ARN=`aws lambda get-function --function-name $AWS_LAMBDA_FUNCTION_NAME | jq -r '.Configuration | .FunctionArn'`
 
   echo "Function $AWS_LAMBDA_FUNCTION_NAME ARN: $AWS_FUNCTION_ARN"
@@ -59,6 +55,7 @@ _awsCreateFunction() {
 ##############################################################
 #
 _awsLambdaConfigureAppDynamics() {
+  # Configure the AWS Lambda function with AppDynamics parameters
   _validateEnvironmentVars "AWS Configure AppDynamics" \
     "APPDYNAMICS_ACCOUNT_NAME" "APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY" "APPDYNAMICS_APPLICATION_NAME" \
     "APPDYNAMICS_CONTROLLER_HOST" "APPDYNAMICS_CONTROLLER_PORT" "APPDYNAMICS_SERVERLESS_API_ENDPOINT" \
@@ -81,6 +78,7 @@ _awsLambdaConfigureAppDynamics() {
 
 
 _awsCreateRestAPI() {
+  # Create an AWS API Gateway API that invoeks the Lambda Function
   _validateEnvironmentVars "AWS Configure AppDynamics" \
     "AWS_API_NAME" "AWS_REGION" "AWS_API_METHOD" "AWS_API_PATH" "AWS_API_STAGE" "AWS_LAMBDA_FUNCTION_NAME"
 
@@ -99,7 +97,7 @@ _awsCreateRestAPI() {
   # Get the API Resurce ID
   AWS_API_RESOURCE_ID=`aws apigateway get-resources --rest-api-id $AWS_REST_API_ID | jq --arg SEARCH_STR $AWS_API_PATH  -r '.items[] | select(.path | test($SEARCH_STR)) | .id'`
   aws apigateway put-method --rest-api-id $AWS_REST_API_ID --resource-id $AWS_API_RESOURCE_ID \
-    --http-method $AWS_API_METHOD --authorization-type "NONE"
+    --http-method $AWS_API_HTTP_METHOD --authorization-type "NONE"
 
   # Get the Functions ARN
   AWS_FN_ARN=`aws lambda list-functions | jq --arg SEARCH_STR $AWS_LAMBDA_FUNCTION_NAME -r '.Functions[] | select(.FunctionName | test($SEARCH_STR)) |  .FunctionArn'`
@@ -107,7 +105,7 @@ _awsCreateRestAPI() {
 
   # set the POST method response to JSON. This is the response type that your API method returns
   aws apigateway put-method-response --rest-api-id $AWS_REST_API_ID --resource-id $AWS_API_RESOURCE_ID \
-    --http-method $AWS_API_METHOD \
+    --http-method $AWS_API_HTTP_METHOD \
     --status-code 200 --response-models application/json=Empty
 
   # Set the Lambda function as the integration point for the POST method
@@ -116,13 +114,13 @@ _awsCreateRestAPI() {
 
   # Set the POST method integration response to JSON. This is the response type that Lambda function returns
   aws apigateway put-integration-response --rest-api-id $AWS_REST_API_ID --resource-id $AWS_API_RESOURCE_ID \
-    --http-method $AWS_API_METHOD \
+    --http-method $AWS_API_HTTP_METHOD \
     --status-code 200 --response-templates application/json=""
 
-  # Deploy the API to a stage called prod.
+  # Deploy the API to a stage called $AWS_API_STAGE (eg PROD)
   aws apigateway create-deployment --rest-api-id $AWS_REST_API_ID --stage-name $AWS_API_STAGE
 
-  # Remove previous policy statement IDs - ignore errors
+  # Remove previous policy statement IDs - Ignore errors
   aws lambda remove-permission --function-name $AWS_LAMBDA_FUNCTION_NAME --statement-id "apigateway-s1-"$AWS_LAMBDA_FUNCTION_NAME
   aws lambda remove-permission --function-name $AWS_LAMBDA_FUNCTION_NAME --statement-id "apigateway-s2-"$AWS_LAMBDA_FUNCTION_NAME
 
@@ -131,44 +129,21 @@ _awsCreateRestAPI() {
     --statement-id "apigateway-s1-"$AWS_LAMBDA_FUNCTION_NAME \
     --action lambda:InvokeFunction \
     --principal apigateway.amazonaws.com \
-    --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$AWS_REST_API_ID/*/$AWS_API_METHOD/$AWS_API_PATH"
+    --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$AWS_REST_API_ID/*/$AWS_API_HTTP_METHOD/$AWS_API_PATH"
 
   # Grant to deployed API permissions to invoke the Lambda function
   aws lambda add-permission --function-name $AWS_LAMBDA_FUNCTION_NAME \
     --statement-id "apigateway-s2-"$AWS_LAMBDA_FUNCTION_NAME \
     --action lambda:InvokeFunction \
     --principal apigateway.amazonaws.com \
-    --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$AWS_REST_API_ID/$AWS_API_STAGE/$AWS_API_METHOD/$AWS_API_PATH"
-
-
-# arn:aws:execute-api:uw-west-1:167766966001:xjwus82ub0/PROD/POST/TEST1
-
+    --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$AWS_REST_API_ID/$AWS_API_STAGE/$AWS_API_HTTP_METHOD/$AWS_API_PATH"
 }
 
-_awsApiX() {
-  API_METHOD=$1
+_awsTestPostApi() {
+  POST_DATA='{"firstName":"David", "lastName":"Ryder"}'
   curl -X POST  \
        -d "$POST_DATA" \
        -H "x-api-key: $API_KEY" \
        -H "Content-Type: application/json" \
-       "https://$API_ID.execute-api.$API_REGION.amazonaws.com/$API_STAGE/$API_METHOD"
+       "https://$API_ID.execute-api.$API_REGION.amazonaws.com/$API_STAGE/$AWS_API_PATH"
 }
-
-
-
-#aws lambda delete-function --function-name $AWS_LAMBDA_FUNCTION_NAME
-
-
-
-
-
-
-
-
-
-
-  #aws lambda get-function-configuration --function-name TEST2
-
-  #aws lambda update-function-code --function-name TEST2 --zip-file fileb://../Eclipse/Lambda/target/Lambda-0.0.1-SNAPSHOT.jar
-
-  #aws iam create-role --role-name DDR-LAMBDA-1 --assume-role-policy-document fileb://AWSLambdaBasicExecutionRole.json

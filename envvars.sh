@@ -18,8 +18,9 @@ export AWS_ACCOUNT_ID="REQUIRED"
 #
 export AWS_LAMBDA_FUNCTION_NAME="APPD-FN-1"
 export AWS_LAMBDA_RUNTIME="java8"
-export AWS_LAMBDA_HANDLER="lambda.Test1"
+export AWS_LAMBDA_HANDLER="lambda.TestFn1"
 export AWS_LAMBDA_ZIP_FILE="LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar"
+export AWS_LAMBDA_ROLE_NAME="APPD-LAMBDA-R1"
 #
 ##############################################################################
 # AWS API Gateway
@@ -51,10 +52,10 @@ export APPDYNAMICS_MACHINE_AGENT_DIR="MachineAgent"
 ##############################################################################
 # AppDynamics SaaS Controller
 # https://docs.appdynamics.com/display/PRO45/Set+Up+the+Serverless+APM+Environment
-export APPDYNAMICS_ACCOUNT_NAME="REQUIRED"
-export APPDYNAMICS_GLOBAL_ACCOUNT_NAME="REQUIRED"
-export APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY="REQUIRED"
-export APPDYNAMICS_CONTROLLER_HOST="REQUIRED"
+export APPDYNAMICS_ACCOUNT_NAME="REQUIRED1"
+export APPDYNAMICS_GLOBAL_ACCOUNT_NAME="REQUIRED2"
+export APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY="REQUIRED3"
+export APPDYNAMICS_CONTROLLER_HOST="REQUIRED4"
 export APPDYNAMICS_SERVERLESS_API_ENDPOINT=https://pdx-sls-agent-api.saas.appdynamics.com
 export APPDYNAMICS_CONTROLLER_PORT=443
 export APPDYNAMICS_APPLICATION_NAME=LAMBDA_TEST_1

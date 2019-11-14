@@ -6,32 +6,18 @@
 # Maintainer: David Ryder, david.ryder@appdynamics.com
 #
 #
-# Requries: jq
+# Requries: jq (brew install jq)
 #
 cmd=${1:-"unknown"}
-
-
-
-#h ttps://grb950ea62.execute-api.us-west-1.amazonaws.com/PROD
-# https://5346onqbkg.execute-api.us-west-1.amazonaws.com/PROD/TEST2
-
+OS_TYPE=`uname -s`
 POST_DATA='{ "firstName": "David", "lastName": "Ryder" }'
 
 # Bash Utility Functions
 . bash-functions.sh
 . aws-functions.sh
+. test-functions.sh
 
-
-_awsApi() {
-  API_METHOD=$1
-  curl -X POST  \
-       -d "$POST_DATA" \
-       -H "x-api-key: $API_KEY" \
-       -H "Content-Type: application/json" \
-       "https://$API_ID.execute-api.$API_REGION.amazonaws.com/$API_STAGE/$API_METHOD"
-}
-
-
+# Commands
 if [ $cmd == "createFunction" ]; then
   _awsCreateFunction
 
@@ -56,6 +42,18 @@ elif [ $cmd == "createRestApi" ]; then
 elif [ $cmd == "listRestApi" ]; then
   aws apigateway get-rest-apis
 
+elif [ $cmd == "testRestApi1" ]; then
+  # Test call to API Gateway using the Java App
+  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
+  java -cp JavaApp/target/pkg1-0.0.1-SNAPSHOT-jar-with-dependencies.jar pkg1.AwsLambda $AWS_REGION $AWS_REST_API_ID $AWS_API_STAGE $AWS_API_PATH '""'
+
+elif [ $cmd == "testRestApi2" ]; then
+  # Test call to API Gateway using curl
+  _awsTestPostApi
+
+elif [ $cmd == "javaAppLoadGen" ]; then
+  _testJavaAppLoadGen1
+
 elif [ $cmd == "deleteRestApi" ]; then
   aws apigateway get-rest-apis
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
@@ -63,12 +61,55 @@ elif [ $cmd == "deleteRestApi" ]; then
   aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
   aws apigateway get-rest-apis
 
-elif [ $cmd == "p1" ]; then
-echo "p1"
+elif [ $cmd == "installJq" ]; then
+  if [ "$OS_TYPE" == "Darwin" ]; then
+      brew install jq
+  elif [ "$OS_TYPE" == "Linux" ]; then
+      sudo apt-get install jq
+  else
+      echo "Unknown OS TYPE: $OS_TYPE"
+  fi
+
+elif [ $cmd == "installAwsCli" ]; then
+  if [ "$OS_TYPE" == "Darwin" ]; then
+    # https://docs.aws.amazon.com/cli/latest/userguide/install-macos.html
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+    unzip awscli-bundle.zip
+    sudo ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    sudo /usr/local/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    aws --version
+  elif [ "$OS_TYPE" == "Linux" ]; then
+    sudo apt-get install awscli
+  else
+    echo "Unknown OS TYPE: $OS_TYPE"
+  fi
+
+elif [ $cmd == "installMaven" ]; then
+  # https://maven.apache.org/download.cgi
+  DOWNLOAD_URL=http://$MAVEN_APACHE_DOWNLOAD_MIRROR/maven/maven-3/3.6.2/binaries/$MAVEN_DOWNLOAD_FILE
+  echo "Downloading: $DOWNLOAD_URL"
+  curl  $DOWNLOAD_URL --output $MAVEN_DOWNLOAD_FILE
+  tar xf $MAVEN_DOWNLOAD_FILE
+  MAVEN_PATH=`pwd`"/$MAVEN_BASE_FILE/bin"
+  echo "set PATH to Maven"
+  echo ' export MAVEN_PATH=`pwd`/$MAVEN_BASE_FILE/bin'
+  echo ' export PATH=$MAVEN_PATH:$PATH'
+
+elif [ $cmd == "buildLambda" ]; then
+  MVN_BIN="$MAVEN_BASE_FILE/bin/mvn"
+  $MVN_BIN -f LambdaFunction/pom.xml clean install -U
+  $MVN_BIN -f LambdaFunction/pom.xml package shade:shade
+  # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
+
+elif [ $cmd == "buildJavaApp" ]; then
+  MVN_BIN="$MAVEN_BASE_FILE/bin/mvn"
+  $MVN_BIN -f JavaApp/pom.xml clean install -U
+  $MVN_BIN -f JavaApp/pom.xml assembly:single
+  # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
 #arn:aws:lambda:us-west-1:167766966001:function:TEST1
 elif [ $cmd == "test1" ]; then
-  _awsApi "TEST1"
+  echo "test1"
 
 elif [ $cmd == "test2" ]; then
   # API Gateway Keys and Access
@@ -86,11 +127,6 @@ elif [ $cmd == "run" ]; then
     _awsApi "TEST2"
     sleep 30
   done
-
-elif [ $CMD == "testAwsApi" ]; then
-  METHOD=$2
-  curl -G "localhost:18081/test/API" --data-urlencode "method=$METHOD"
-
 
 else
   echo "Command unknown: "$cmd

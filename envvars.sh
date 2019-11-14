@@ -11,7 +11,7 @@
 # AWS Account
 #
 export AWS_REGION="us-west-1"
-export AWS_ACCOUNT_ID="REQUIRED"
+export AWS_ACCOUNT_ID="REQUIRED_AAI"
 #
 ##############################################################################
 # AWS Lambda Function
@@ -25,7 +25,7 @@ export AWS_LAMBDA_ROLE_NAME="APPD-LAMBDA-R1"
 ##############################################################################
 # AWS API Gateway
 #
-export AWS_API_NAME="APPD_API_1"
+export AWS_API_NAME="APPD-API-1"
 export AWS_API_STAGE="PROD"
 export AWS_API_HTTP_METHOD="POST"
 export AWS_API_PATH="APPDTEST1"
@@ -52,10 +52,10 @@ export APPDYNAMICS_MACHINE_AGENT_DIR="MachineAgent"
 ##############################################################################
 # AppDynamics SaaS Controller
 # https://docs.appdynamics.com/display/PRO45/Set+Up+the+Serverless+APM+Environment
-export APPDYNAMICS_ACCOUNT_NAME="REQUIRED1"
-export APPDYNAMICS_GLOBAL_ACCOUNT_NAME="REQUIRED2"
-export APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY="REQUIRED3"
-export APPDYNAMICS_CONTROLLER_HOST="REQUIRED4"
+export APPDYNAMICS_ACCOUNT_NAME="REQUIRED_AAN"
+export APPDYNAMICS_GLOBAL_ACCOUNT_NAME="REQUIRED_AGNN"
+export APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY="REQUIRED_AAAAK"
+export APPDYNAMICS_CONTROLLER_HOST="REQUIRED_ACH"
 export APPDYNAMICS_SERVERLESS_API_ENDPOINT=https://pdx-sls-agent-api.saas.appdynamics.com
 export APPDYNAMICS_CONTROLLER_PORT=443
 export APPDYNAMICS_APPLICATION_NAME=LAMBDA_TEST_1
@@ -64,4 +64,5 @@ export APPDYNAMICS_NODE_NAME=LAMBDA_NODE_N1
 export APPDYNAMICS_LOG_LEVEL=DEBUG
 #
 ##############################################################################
-#
+# Test HTTP POST payload data
+export APPD_POST_DATA='{ "address": "302 2nd Street", "city": "San Francisco", "zip": "94107" }'

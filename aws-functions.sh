@@ -141,9 +141,8 @@ _awsCreateRestAPI() {
 
 _awsTestPostApi() {
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
-  POST_DATA='{"firstName":"David", "lastName":"Ryder"}'
   curl -X POST  \
-       -d "$POST_DATA" \
+       -d "$APPD_POST_DATA" \
        -H "x-api-key: $API_KEY" \
        -H "Content-Type: application/json" \
        "https://$AWS_REST_API_ID.execute-api.$AWS_REGION.amazonaws.com/$AWS_API_STAGE/$AWS_API_PATH"

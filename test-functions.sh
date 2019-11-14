@@ -39,7 +39,7 @@ _testJavaAppLoadGen1() {
       --data-urlencode "stage=$AWS_API_STAGE" \
       --data-urlencode "apiPath=$AWS_API_PATH" \
       --data-urlencode "apiKey=$AWS_API_KEY" \
-      --data-urlencode "message=$MESSAGE_STR"
+      --data-urlencode "message=$APPD_POST_DATA"
     sleep $INTERVAL_SEC
   done
   echo "Complete _testJavaAppLoadGen1"

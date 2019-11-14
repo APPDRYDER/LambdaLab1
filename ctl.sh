@@ -25,7 +25,7 @@ elif [ $cmd == "listFunctions" ]; then
   aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler, FunctionArn}  ]'
 
 elif [ $cmd == "invokeFunction" ]; then
-   aws lambda invoke --function-name $AWS_LAMBDA_FUNCTION_NAME --payload '{"firstName":"David","lastName":"Ryder"}' /dev/stdout
+   aws lambda invoke --function-name $AWS_LAMBDA_FUNCTION_NAME --payload "$POST_DATA" /dev/stdout
 
 elif [ $cmd == "updateFunctionCode" ]; then
   aws lambda update-function-code --function-name $AWS_LAMBDA_FUNCTION_NAME --zip-file $AWS_LAMBDA_ZIP_FILE
@@ -43,13 +43,16 @@ elif [ $cmd == "listRestApi" ]; then
   aws apigateway get-rest-apis
 
 elif [ $cmd == "testRestApi1" ]; then
+  # Test call to API Gateway and invoke Lamnda Function using curl
+  _awsTestPostApi
+
+elif [ $cmd == "testRestApi2" ]; then
   # Test call to API Gateway using the Java App
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
   java -cp JavaApp/target/pkg1-0.0.1-SNAPSHOT-jar-with-dependencies.jar pkg1.AwsLambda $AWS_REGION $AWS_REST_API_ID $AWS_API_STAGE $AWS_API_PATH '""'
 
-elif [ $cmd == "testRestApi2" ]; then
-  # Test call to API Gateway using curl
-  _awsTestPostApi
+elif [ $cmd == "startJavaApp" ]; then
+  _startJavaApp
 
 elif [ $cmd == "javaAppLoadGen" ]; then
   _testJavaAppLoadGen1

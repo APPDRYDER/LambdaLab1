@@ -19,7 +19,7 @@ POST_DATA='{ "firstName": "David", "lastName": "Ryder" }'
 
 # Commands
 if [ $cmd == "createFunction" ]; then
-  _awsCreateFunction
+  _awsLambdaCreateFunction
 
 elif [ $cmd == "listFunctions" ]; then
   aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler, FunctionArn}  ]'
@@ -86,6 +86,8 @@ elif [ $cmd == "installAwsCli" ]; then
 
 elif [ $cmd == "installMaven" ]; then
   # https://maven.apache.org/download.cgi
+  _validateEnvironmentVars "Installing Apache Maven" \
+    "MAVEN_APACHE_DOWNLOAD_MIRROR" "MAVEN_DOWNLOAD_FILE"
   DOWNLOAD_URL=http://$MAVEN_APACHE_DOWNLOAD_MIRROR/maven/maven-3/3.6.2/binaries/$MAVEN_DOWNLOAD_FILE
   echo "Downloading: $DOWNLOAD_URL"
   curl  $DOWNLOAD_URL --output $MAVEN_DOWNLOAD_FILE

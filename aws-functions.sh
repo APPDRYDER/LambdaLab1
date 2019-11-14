@@ -79,8 +79,8 @@ _awsLambdaConfigureAppDynamics() {
 
 _awsCreateRestAPI() {
   # Create an AWS API Gateway API that invoeks the Lambda Function
-  _validateEnvironmentVars "AWS Configure AppDynamics" \
-    "AWS_API_NAME" "AWS_REGION" "AWS_API_METHOD" "AWS_API_PATH" "AWS_API_STAGE" "AWS_LAMBDA_FUNCTION_NAME"
+  _validateEnvironmentVars "AWS Configure AWS API Gateway" \
+    "AWS_API_NAME" "AWS_REGION" "AWS_API_PATH" "AWS_API_PATH" "AWS_API_STAGE" "AWS_LAMBDA_FUNCTION_NAME"
 
   # Create API gateway
   aws apigateway create-rest-api --name $AWS_API_NAME --region $AWS_REGION
@@ -140,10 +140,11 @@ _awsCreateRestAPI() {
 }
 
 _awsTestPostApi() {
+  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
   POST_DATA='{"firstName":"David", "lastName":"Ryder"}'
   curl -X POST  \
        -d "$POST_DATA" \
        -H "x-api-key: $API_KEY" \
        -H "Content-Type: application/json" \
-       "https://$API_ID.execute-api.$API_REGION.amazonaws.com/$API_STAGE/$AWS_API_PATH"
+       "https://$AWS_REST_API_ID.execute-api.$AWS_REGION.amazonaws.com/$AWS_API_STAGE/$AWS_API_PATH"
 }

@@ -1,0 +1,2 @@
+# Ignore all Java Maven target directories
+ignore target/

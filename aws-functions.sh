@@ -26,13 +26,19 @@ _awsLambdaCreateFunction() {
               "Principal": { "Service": "lambda.amazonaws.com" } } ] }' > $AWS_ROLE_POLICY_DOC_FILE
 
   # Create the role for lambda functions
-  aws iam create-role --role-name $AWS_LAMBDA_ROLE_NAME --assume-role-policy-document "fileb://$AWS_ROLE_POLICY_DOC_FILE"
+  aws iam create-role --role-name $AWS_LAMBDA_ROLE_NAME --assume-role-policy-document "file://$AWS_ROLE_POLICY_DOC_FILE"
+  sleep 15 # Allow time for role to create
 
-  # Get the role ARN
-  AWS_ROLE_ARN=`aws iam get-role --role-name $AWS_LAMBDA_ROLE_NAME | jq -r '.Role | .Arn'`
-  echo "Role $AWS_LAMBDA_ROLE_NAME ARN $AWS_ROLE_ARN"
+  # Get the role ARN, need to wait for role to create
+  AWS_ROLE_ARN=""
+  while [ "$AWS_ROLE_ARN" == "" ]; do
+    sleep 5
+    AWS_ROLE_ARN=`aws iam get-role --role-name $AWS_LAMBDA_ROLE_NAME | jq -r '.Role | .Arn'`
+  done
+  echo "Role created: $AWS_LAMBDA_ROLE_NAME ARN $AWS_ROLE_ARN"
 
   # List functions: name, runtime, handler
+  echo "Current functions"
   aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler}  ]'
 
   # Create the lambda functions against the role
@@ -48,7 +54,8 @@ _awsLambdaCreateFunction() {
   # Get the function ARN
   AWS_FUNCTION_ARN=`aws lambda get-function --function-name $AWS_LAMBDA_FUNCTION_NAME | jq -r '.Configuration | .FunctionArn'`
 
-  echo "Function $AWS_LAMBDA_FUNCTION_NAME ARN: $AWS_FUNCTION_ARN"
+  echo "Function Created: $AWS_LAMBDA_FUNCTION_NAME ARN: $AWS_FUNCTION_ARN"
+  aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler}  ]'
 } # _awsCreateFunction
 
 

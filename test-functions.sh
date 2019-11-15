@@ -56,6 +56,7 @@ _startJavaApp() {
   if [ -e "$APPDYNAMICS_APPLICATION_AGENT_JAR_FILE" ]; then
     export JAVA_OPTS="$JAVA_OPTS -javaagent:$APPDYNAMICS_APPLICATION_AGENT_JAR_FILE "
   else
+    echo ""
     echo "AppDynamics Java Agent not found (APPDYNAMICS_APP_AGENT_JAR_FILE): $APPDYNAMICS_APPLICATION_AGENT_JAR_FILE"
     exit 0
   fi

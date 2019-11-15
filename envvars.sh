@@ -46,23 +46,39 @@ export JAVA_TEST_APP_JAR="JavaApp/target/pkg1-0.0.1-SNAPSHOT-jar-with-dependenci
 ##############################################################################
 # AppDynamics Agents
 #
-export APPDYNAMICS_APPLICATION_AGENT_JAR_FILE="AppServerAgent-4.5.15.28231/javaagent.jar"
+export APPDYNAMICS_APPLICATION_AGENT_JAR_FILE="AppServerAgent/javaagent.jar"
 export APPDYNAMICS_MACHINE_AGENT_DIR="MachineAgent"
 #
 ##############################################################################
 # AppDynamics SaaS Controller
 # https://docs.appdynamics.com/display/PRO45/Set+Up+the+Serverless+APM+Environment
-export APPDYNAMICS_ACCOUNT_NAME="REQUIRED_AAN"
+export APPDYNAMICS_AGENT_ACCOUNT_NAME="REQUIRED_AAN"
 export APPDYNAMICS_GLOBAL_ACCOUNT_NAME="REQUIRED_AGNN"
 export APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY="REQUIRED_AAAAK"
-export APPDYNAMICS_CONTROLLER_HOST="REQUIRED_ACH"
+export APPDYNAMICS_CONTROLLER_HOST_NAME="REQUIRED_ACH"
 export APPDYNAMICS_SERVERLESS_API_ENDPOINT=https://pdx-sls-agent-api.saas.appdynamics.com
 export APPDYNAMICS_CONTROLLER_PORT=443
+export APPDYNAMICS_CONTROLLER_SSL_ENABLED="true"
 export APPDYNAMICS_APPLICATION_NAME=LAMBDA_TEST_1
 export APPDYNAMICS_TIER_NAME=LAMBDA_TIER_T1
 export APPDYNAMICS_NODE_NAME=LAMBDA_NODE_N1
 export APPDYNAMICS_LOG_LEVEL=DEBUG
 #
 ##############################################################################
+# AppDynamics SaaS Controller Additionals for Agents
+#
+# Account Access
+export APPDYNAMICS_ANALYTICS_API_KEY="NOT_REQUIRED"
+#
+# Events Service
+export APPDYNAMICS_ANALYTICS_AGENT_URL=http://localhost:9090/v2/sinks/bt
+export APPDYNAMICS_EVENTS_SERVICE_ENDPOINT_LOCAL=""
+export APPDYNAMICS_EVENTS_SERVICE_ENDPOINT=""
+#
+export APPDYNAMICS_SIM_ENABLED=true
+#
+##############################################################################
 # Test HTTP POST payload data
 export APPD_POST_DATA='{ "address": "302 2nd Street", "city": "San Francisco", "zip": "94107" }'
+#
+#

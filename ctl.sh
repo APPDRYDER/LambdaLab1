@@ -61,7 +61,7 @@ elif [ $cmd == "javaAppLoadGen" ]; then
 elif [ $cmd == "deleteRestApi" ]; then
   aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
-  echo "Deleting $AWS_API_NAME ID: $AWS_REST_API_ID"
+  echo "Deleting $AWS_API_NAME ID: ($AWS_REST_API_ID)"
   aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
   aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 

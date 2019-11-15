@@ -149,7 +149,7 @@ _awsCreateRestAPI() {
     --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$AWS_REST_API_ID/$AWS_API_STAGE/$AWS_API_HTTP_METHOD/$AWS_API_PATH"
 }
 
-_awsTestPostApi() {
+_awsTestPostApiCurl() {
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
   curl -X POST  \
        -d "$APPD_POST_DATA" \

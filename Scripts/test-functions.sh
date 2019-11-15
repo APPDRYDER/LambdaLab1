@@ -98,3 +98,9 @@ _startJavaApp() {
   # Tail the log file for 60 seconds
   _tailLog 60 nohup.out
 }
+
+_awsTestPostApiJavaApp() {
+  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
+  java -cp $JAVA_TEST_APP_JAR pkg1.AwsLambda $AWS_REGION $AWS_REST_API_ID $AWS_API_STAGE $AWS_API_PATH '""' "$APPD_POST_DATA"
+
+}

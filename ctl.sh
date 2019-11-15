@@ -50,14 +50,13 @@ elif [ $cmd == "deleteRestApi" ]; then
   aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
   aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 
-elif [ $cmd == "testRestApi1" ]; then
+elif [ $cmd == "testRestApiCurl" ]; then
   # Test call to API Gateway and invoke Lamnda Function using curl
-  _awsTestPostApi
+  _awsTestPostApiCurl
 
-elif [ $cmd == "testRestApi2" ]; then
+elif [ $cmd == "testRestApiJavaApp" ]; then
   # Test call to API Gateway using the Java App
-  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
-  java -cp $JAVA_TEST_APP_JAR pkg1.AwsLambda $AWS_REGION $AWS_REST_API_ID $AWS_API_STAGE $AWS_API_PATH '""' "$APPD_POST_DATA"
+  _awsTestPostApiJavaApp
 
 elif [ $cmd == "startJavaApp" ]; then
   _startJavaApp
@@ -65,7 +64,7 @@ elif [ $cmd == "startJavaApp" ]; then
 elif [ $cmd == "stopJavaApp" ]; then
   _stopJavaApp
 
-elif [ $cmd == "javaAppLoadGen" ]; then
+elif [ $cmd == "loadGenJavaApp" ]; then
   _testJavaAppLoadGen1
 
 elif [ $cmd == "installJq" ]; then
@@ -136,10 +135,10 @@ else
   echo "  createRestApi"
   echo "  listRestApi"
   echo "  deleteRestApi"
-  echo "  testRestApi1"
-  echo "  testRestApi2"
+  echo "  testRestApiCurl"
+  echo "  testRestApiJavaApp"
   echo "  startJavaApp"
-  echo "  javaAppLoadGen"
+  echo "  loadGenJavaApp"
   echo "  installJq"
   echo "  installAwsCli"
   echo "  installMaven"

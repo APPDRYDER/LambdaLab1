@@ -32,6 +32,7 @@ elif [ $cmd == "updateFunctionCode" ]; then
 
 elif [ $cmd == "deleteFunction" ]; then
   aws lambda delete-function --function-name $AWS_LAMBDA_FUNCTION_NAME
+  # aws iam delete-role --role-name $AWS_LAMBDA_ROLE_NAME
 
 elif [ $cmd == "configureAppDynamics" ]; then
   _awsLambdaConfigureAppDynamics
@@ -58,11 +59,11 @@ elif [ $cmd == "javaAppLoadGen" ]; then
   _testJavaAppLoadGen1
 
 elif [ $cmd == "deleteRestApi" ]; then
-  aws apigateway get-rest-apis
+  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
   echo "Deleting $AWS_API_NAME ID: $AWS_REST_API_ID"
   aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
-  aws apigateway get-rest-apis
+  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 
 elif [ $cmd == "installJq" ]; then
   if [ "$OS_TYPE" == "Darwin" ]; then

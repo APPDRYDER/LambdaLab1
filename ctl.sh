@@ -28,13 +28,13 @@ elif [ $cmd == "invokeFunction" ]; then
    aws lambda invoke --function-name $AWS_LAMBDA_FUNCTION_NAME --payload "$APPD_POST_DATA" /dev/stdout
 
 elif [ $cmd == "updateFunctionCode" ]; then
-  aws lambda update-function-code --function-name $AWS_LAMBDA_FUNCTION_NAME --zip-file $AWS_LAMBDA_ZIP_FILE
+  aws lambda update-function-code --function-name $AWS_LAMBDA_FUNCTION_NAME --zip-file fileb://$AWS_LAMBDA_ZIP_FILE
 
 elif [ $cmd == "deleteFunction" ]; then
   aws lambda delete-function --function-name $AWS_LAMBDA_FUNCTION_NAME
   # aws iam delete-role --role-name $AWS_LAMBDA_ROLE_NAME
 
-elif [ $cmd == "configureAppDynamics" ]; then
+elif [ $cmd == "configureAppDynamicsLambda" ]; then
   _awsLambdaConfigureAppDynamics
 
 elif [ $cmd == "createRestApi" ]; then
@@ -131,7 +131,7 @@ else
   echo "  invokeFunction"
   echo "  updateFunctionCode"
   echo "  deleteFunction"
-  echo "  configureAppDynamics"
+  echo "  configureAppDynamicsLambda"
   echo "  createRestApi"
   echo "  listRestApi"
   echo "  deleteRestApi"

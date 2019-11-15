@@ -12,7 +12,7 @@ cmd=${1:-"unknown"}
 OS_TYPE=`uname -s`
 
 
-# Bash Utility Functions
+# Bash, AWS and Java Aoo Test Utility Functions
 . bash-functions.sh
 . aws-functions.sh
 . test-functions.sh
@@ -41,7 +41,14 @@ elif [ $cmd == "createRestApi" ]; then
   _awsCreateRestAPI
 
 elif [ $cmd == "listRestApi" ]; then
-  aws apigateway get-rest-apis
+  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
+
+elif [ $cmd == "deleteRestApi" ]; then
+  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
+  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
+  echo "Deleting $AWS_API_NAME ID: ($AWS_REST_API_ID)"
+  aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
+  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 
 elif [ $cmd == "testRestApi1" ]; then
   # Test call to API Gateway and invoke Lamnda Function using curl
@@ -57,13 +64,6 @@ elif [ $cmd == "startJavaApp" ]; then
 
 elif [ $cmd == "javaAppLoadGen" ]; then
   _testJavaAppLoadGen1
-
-elif [ $cmd == "deleteRestApi" ]; then
-  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
-  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
-  echo "Deleting $AWS_API_NAME ID: ($AWS_REST_API_ID)"
-  aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
-  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 
 elif [ $cmd == "installJq" ]; then
   if [ "$OS_TYPE" == "Darwin" ]; then
@@ -113,20 +113,8 @@ elif [ $cmd == "buildJavaApp" ]; then
   $MVN_BIN -f JavaApp/pom.xml assembly:single
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
-#arn:aws:lambda:us-west-1:167766966001:function:TEST1
-elif [ $cmd == "test1" ]; then
-  echo "test1"
-
-elif [ $cmd == "test2" ]; then
-  # API Gateway Keys and Access
-  API_ID="hrb950ea62"
-  API_REGION="us-west-1"
-  API_KEY="zT8n9fuqt22f0zvAKMqqx336xEnqHvDO1DbOgaN6"
-  API_STAGE="PROD"
-  _awsApi "TEST2"
-
 elif [ $cmd == "run" ]; then
-  ITERATIONS=1000
+  ITERATIONS=5
   for I in $(seq 0 $((ITERATIONS))); do
     _awsApi "TEST1"
     sleep 30
@@ -135,7 +123,6 @@ elif [ $cmd == "run" ]; then
   done
 
 else
-  echo "Command unknown: "$cmd
   echo "Commands: "
   echo "  createFunction"
   echo "  listFunctions"
@@ -146,6 +133,15 @@ else
   echo "  createRestApi"
   echo "  listRestApi"
   echo "  deleteRestApi"
+  echo "  testRestApi1"
+  echo "  testRestApi2"
+  echo "  startJavaApp"
+  echo "  javaAppLoadGen"
+  echo "  installJq"
+  echo "  installAwsCli"
+  echo "  installMaven"
+  echo "  buildLambda"
+  echo "  buildJavaApp"
 
 fi
 

@@ -13,9 +13,9 @@ OS_TYPE=`uname -s`
 
 
 # Bash, AWS and Java Aoo Test Utility Functions
-. bash-functions.sh
-. aws-functions.sh
-. test-functions.sh
+. Scripts/bash-functions.sh
+. Scripts/aws-functions.sh
+. Scripts/test-functions.sh
 
 # Commands
 if [ $cmd == "createFunction" ]; then

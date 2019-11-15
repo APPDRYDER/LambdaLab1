@@ -62,6 +62,9 @@ elif [ $cmd == "testRestApi2" ]; then
 elif [ $cmd == "startJavaApp" ]; then
   _startJavaApp
 
+elif [ $cmd == "stopJavaApp" ]; then
+  _stopJavaApp
+
 elif [ $cmd == "javaAppLoadGen" ]; then
   _testJavaAppLoadGen1
 

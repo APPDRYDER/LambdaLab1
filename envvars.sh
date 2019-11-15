@@ -42,6 +42,8 @@ export MAVEN_APACHE_DOWNLOAD_MIRROR="apache-mirror.8birdsvideo.com"
 # Java Test application
 #
 export JAVA_TEST_APP_JAR="JavaApp/target/pkg1-0.0.1-SNAPSHOT-jar-with-dependencies.jar "
+export JAVA_TEST_APP_TIER_NAME="JAVA_TIER_T1"
+export JAVA_TEST_APP_NODE_NAME="JAVA_NODE_N"
 #
 ##############################################################################
 # AppDynamics Agents

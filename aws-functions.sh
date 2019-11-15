@@ -113,7 +113,8 @@ _awsCreateRestAPI() {
   # set the POST method response to JSON. This is the response type that your API method returns
   aws apigateway put-method-response --rest-api-id $AWS_REST_API_ID --resource-id $AWS_API_RESOURCE_ID \
     --http-method $AWS_API_HTTP_METHOD \
-    --status-code 200 --response-models application/json=Empty
+    --status-code 200 --response-models '{"application/json":"Empty"}'
+    #"application/json=Empty"
 
   # Set the Lambda function as the integration point for the POST method
   aws apigateway put-integration --rest-api-id $AWS_REST_API_ID --resource-id $AWS_API_RESOURCE_ID --http-method POST --type AWS \
@@ -122,7 +123,8 @@ _awsCreateRestAPI() {
   # Set the POST method integration response to JSON. This is the response type that Lambda function returns
   aws apigateway put-integration-response --rest-api-id $AWS_REST_API_ID --resource-id $AWS_API_RESOURCE_ID \
     --http-method $AWS_API_HTTP_METHOD \
-    --status-code 200 --response-templates application/json=""
+    --status-code 200 --response-templates '{"application/json":""}'
+    # 'application/json=""'
 
   # Deploy the API to a stage called $AWS_API_STAGE (eg PROD)
   aws apigateway create-deployment --rest-api-id $AWS_REST_API_ID --stage-name $AWS_API_STAGE

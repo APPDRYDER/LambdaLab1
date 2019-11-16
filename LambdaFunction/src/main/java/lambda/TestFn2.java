@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import com.google.common.io.CharStreams;
+import org.json.JSONObject;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.appdynamics.serverless.tracers.aws.api.MonitoredRequestStreamHandler;
@@ -16,7 +17,15 @@ public class TestFn2 extends MonitoredRequestStreamHandler {
 		String s1 = null;
 		Reader reader = new InputStreamReader(input);
 		s1 = CharStreams.toString(reader);
-		System.out.println(String.format("Read v1 %s", s1));
+		try {
+			JSONObject j = new JSONObject(s1);
+			System.out.println(String.format("JSON ok %s", s1));
+			if (j.has("error")) {
+				throw new java.lang.Error("Error");
+			}	
+		} catch (Exception e) {
+			System.out.println(String.format("JSON error %s, %s", s1, e));
+		}
 		String s2 = s1.toUpperCase();
 		output.write(s2.getBytes());
 	} // handleMonitoredRequest

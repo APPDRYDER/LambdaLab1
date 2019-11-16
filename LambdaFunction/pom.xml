@@ -21,26 +21,30 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    
-    
-    <dependency>
-    	<groupId>com.amazonaws</groupId>
-    	<artifactId>aws-lambda-java-core</artifactId>
-    	<version>1.2.0</version>
-    </dependency>
-    
+
     <dependency>
     	<groupId>org.apache.maven.plugins</groupId>
     	<artifactId>maven-shade-plugin</artifactId>
     	<version>3.2.1</version>
     </dependency>
-    
+
+    <dependency>
+    	<groupId>com.amazonaws</groupId>
+    	<artifactId>aws-lambda-java-core</artifactId>
+    	<version>1.2.0</version>
+    </dependency>
+
     <dependency>
     	<groupId>com.appdynamics</groupId>
     	<artifactId>lambda-tracer</artifactId>
     	<version>1.1.1363</version>
     </dependency>
-    
-    
+
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20190722</version>
+    </dependency>
+
   </dependencies>
 </project>

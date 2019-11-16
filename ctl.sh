@@ -30,6 +30,10 @@ elif [ $cmd == "invokeFunction" ]; then
 elif [ $cmd == "updateFunctionCode" ]; then
   aws lambda update-function-code --function-name $AWS_LAMBDA_FUNCTION_NAME --zip-file fileb://$AWS_LAMBDA_ZIP_FILE
 
+elif [ $cmd == "updateFunctionHandler" ]; then
+  HANDLER=${2:-"$AWS_LAMBDA_HANDLER"}
+  aws lambda update-function-configuration --function-name $AWS_LAMBDA_FUNCTION_NAME --handler $HANDLER
+
 elif [ $cmd == "deleteFunction" ]; then
   aws lambda delete-function --function-name $AWS_LAMBDA_FUNCTION_NAME
   # aws iam delete-role --role-name $AWS_LAMBDA_ROLE_NAME

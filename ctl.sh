@@ -36,7 +36,7 @@ elif [ $cmd == "updateFunctionHandler" ]; then
 
 elif [ $cmd == "deleteFunction" ]; then
   aws lambda delete-function --function-name $AWS_LAMBDA_FUNCTION_NAME
-  # aws iam delete-role --role-name $AWS_LAMBDA_ROLE_NAME
+  aws iam delete-role --role-name $AWS_LAMBDA_ROLE_NAME
 
 elif [ $cmd == "configureAppDynamicsLambda" ]; then
   _awsLambdaConfigureAppDynamics
@@ -48,11 +48,9 @@ elif [ $cmd == "listRestApi" ]; then
   aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 
 elif [ $cmd == "deleteRestApi" ]; then
-  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
   echo "Deleting $AWS_API_NAME ID: ($AWS_REST_API_ID)"
   aws apigateway delete-rest-api --rest-api-id $AWS_REST_API_ID
-  aws apigateway get-rest-apis | jq -r '.items[] | {name, id}'
 
 elif [ $cmd == "testRestApiCurl" ]; then
   # Test call to API Gateway and invoke Lamnda Function using curl
@@ -61,7 +59,9 @@ elif [ $cmd == "testRestApiCurl" ]; then
 elif [ $cmd == "testRestApiCurlError" ]; then
   # Test call to API Gateway and invoke Lamnda Function using curl
   # Trigger the Lambda function to error
-  _awsTestPostApiCurlError
+  INTERATIONS_N=${2:-1}
+  INTERVAL_SEC=${3:-1}
+  _awsTestPostApiCurlError $INTERATIONS_N $INTERVAL_SEC
 
 elif [ $cmd == "testRestApiJavaApp" ]; then
   # Test call to API Gateway using the Java App
@@ -74,7 +74,7 @@ elif [ $cmd == "stopJavaApp" ]; then
   _stopJavaApp
 
 elif [ $cmd == "loadGenJavaApp" ]; then
-  _testJavaAppLoadGen1
+  _testJavaAppLoadGen1 &
 
 elif [ $cmd == "installJq" ]; then
   if [ "$OS_TYPE" == "Darwin" ]; then

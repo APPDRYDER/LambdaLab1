@@ -10,8 +10,11 @@
 # Load generator for the Java App
 _testJavaAppLoadGen1() {
   # Invoke the the JavaApp API test/API with AWS API Gateway url
-  INTERATIONS_N=1024
+  INTERATIONS_N=240
   INTERVAL_SEC=15
+
+  # Stop the current process
+   pkill -lf "loadGenJavaApp"
 
   # ID of the API Gateway REST API
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
@@ -42,7 +45,7 @@ _testJavaAppLoadGen1() {
       --data-urlencode """message=$APPD_POST_DATA"""
     sleep $INTERVAL_SEC
   done
-  echo "Complete _testJavaAppLoadGen1"
+  echo "Stopping _testJavaAppLoadGen1"
 }
 
 _awsTestPostApiJavaApp() {

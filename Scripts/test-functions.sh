@@ -107,3 +107,7 @@ _startJavaApp() {
   # Tail the log file for 60 seconds
   _tailLog 60 nohup.out
 }
+
+_test1() {
+  echo "_test1 $1"
+}

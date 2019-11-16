@@ -58,6 +58,11 @@ elif [ $cmd == "testRestApiCurl" ]; then
   # Test call to API Gateway and invoke Lamnda Function using curl
   _awsTestPostApiCurl
 
+elif [ $cmd == "testRestApiCurlError" ]; then
+  # Test call to API Gateway and invoke Lamnda Function using curl
+  # Trigger the Lambda function to error
+  _awsTestPostApiCurlError
+
 elif [ $cmd == "testRestApiJavaApp" ]; then
   # Test call to API Gateway using the Java App
   _awsTestPostApiJavaApp
@@ -119,6 +124,9 @@ elif [ $cmd == "buildJavaApp" ]; then
   $MVN_BIN -f JavaApp/pom.xml assembly:single
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
+elif [ $cmd == "test1" ]; then
+  _test1 A B C
+
 elif [ $cmd == "run" ]; then
   ITERATIONS=5
   for I in $(seq 0 $((ITERATIONS))); do
@@ -140,6 +148,7 @@ else
   echo "  listRestApi"
   echo "  deleteRestApi"
   echo "  testRestApiCurl"
+  echo "  testRestApiCurlError"
   echo "  testRestApiJavaApp"
   echo "  startJavaApp"
   echo "  loadGenJavaApp"

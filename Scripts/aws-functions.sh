@@ -157,3 +157,13 @@ _awsTestPostApiCurl() {
        -H "Content-Type: application/json" \
        "https://$AWS_REST_API_ID.execute-api.$AWS_REGION.amazonaws.com/$AWS_API_STAGE/$AWS_API_PATH"
 }
+
+_awsTestPostApiCurlError() {
+  POST_DATA='{ "error": "trigger an error"}'
+  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
+  curl -X POST  \
+       -d "$POST_DATA" \
+       -H "x-api-key: $API_KEY" \
+       -H "Content-Type: application/json" \
+       "https://$AWS_REST_API_ID.execute-api.$AWS_REGION.amazonaws.com/$AWS_API_STAGE/$AWS_API_PATH"
+}

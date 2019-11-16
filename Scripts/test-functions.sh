@@ -39,10 +39,16 @@ _testJavaAppLoadGen1() {
       --data-urlencode "stage=$AWS_API_STAGE" \
       --data-urlencode "apiPath=$AWS_API_PATH" \
       --data-urlencode "apiKey=$AWS_API_KEY" \
-      --data-urlencode "message=$APPD_POST_DATA"
+      --data-urlencode """message=$APPD_POST_DATA"""
     sleep $INTERVAL_SEC
   done
   echo "Complete _testJavaAppLoadGen1"
+}
+
+_awsTestPostApiJavaApp() {
+  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
+  java -cp $JAVA_TEST_APP_JAR pkg1.AwsLambda $AWS_REGION $AWS_REST_API_ID $AWS_API_STAGE $AWS_API_PATH '""' "$APPD_POST_DATA"
+
 }
 
 _stopJavaApp() {
@@ -100,10 +106,4 @@ _startJavaApp() {
 
   # Tail the log file for 60 seconds
   _tailLog 60 nohup.out
-}
-
-_awsTestPostApiJavaApp() {
-  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
-  java -cp $JAVA_TEST_APP_JAR pkg1.AwsLambda $AWS_REGION $AWS_REST_API_ID $AWS_API_STAGE $AWS_API_PATH '""' "$APPD_POST_DATA"
-
 }

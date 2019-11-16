@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    unzip curl jq maven awscli
+    unzip curl sudo jq maven awscli
 # openjdk-8-jdk
 
 # Timezone

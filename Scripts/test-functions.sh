@@ -46,6 +46,7 @@ _testJavaAppLoadGen1() {
 }
 
 _stopJavaApp() {
+  _validateEnvironmentVars "Stop Java App" "JAVA_TEST_APP_JAR"
   # Stop
   echo "Stop running instance of $JAVA_TEST_APP_JAR"
   ps -ef | grep "$JAVA_TEST_APP_JAR" ; sleep 1

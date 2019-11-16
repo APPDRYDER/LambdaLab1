@@ -107,19 +107,24 @@ elif [ $cmd == "installMaven" ]; then
   echo "Downloading: $DOWNLOAD_URL"
   curl  $DOWNLOAD_URL --output $MAVEN_DOWNLOAD_FILE
   tar xf $MAVEN_DOWNLOAD_FILE
-  MAVEN_PATH=`pwd`"/$MAVEN_BASE_FILE/bin"
-  echo "set PATH to Maven"
-  echo ' export MAVEN_PATH=`pwd`/$MAVEN_BASE_FILE/bin'
-  echo ' export PATH=$MAVEN_PATH:$PATH'
+  # Find MAVEN_PATH
+  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin"; else MVN_BIN=`which mvn`; fi
+  echo "Maven is installed: $MVN_BIN"
+  #MAVEN_PATH=`pwd`"/$MAVEN_BASE_FILE/bin"
+  #echo "set PATH to Maven"
+  #echo ' export MAVEN_PATH=`pwd`/$MAVEN_BASE_FILE/bin'
+  #echo ' export PATH=$MAVEN_PATH:$PATH'
 
 elif [ $cmd == "buildLambda" ]; then
-  MVN_BIN="$MAVEN_BASE_FILE/bin/mvn"
+  # Find MAVEN_PATH
+  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
   $MVN_BIN -f LambdaFunction/pom.xml clean install -U
   $MVN_BIN -f LambdaFunction/pom.xml package shade:shade
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
 elif [ $cmd == "buildJavaApp" ]; then
-  MVN_BIN="$MAVEN_BASE_FILE/bin/mvn"
+  # Find MAVEN_PATH
+  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
   $MVN_BIN -f JavaApp/pom.xml clean install -U
   $MVN_BIN -f JavaApp/pom.xml assembly:single
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar

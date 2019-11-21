@@ -117,14 +117,16 @@ elif [ $cmd == "installMaven" ]; then
 
 elif [ $cmd == "buildLambda" ]; then
   # Find MAVEN_PATH
-  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
+  # if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
+  MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"
   $MVN_BIN -f LambdaFunction/pom.xml clean install -U
   $MVN_BIN -f LambdaFunction/pom.xml package shade:shade
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
 elif [ $cmd == "buildJavaApp" ]; then
   # Find MAVEN_PATH
-  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
+  # if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
+  MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"
   $MVN_BIN -f JavaApp/pom.xml clean install -U
   $MVN_BIN -f JavaApp/pom.xml assembly:single
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar

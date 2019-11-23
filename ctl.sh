@@ -138,9 +138,10 @@ elif [ $cmd == "buildJavaApp" ]; then
 
 elif [ $cmd == "dockerBuild" ]; then
   # Copy in AppDynamcis agents
-  cp ~/Downloads/AppD-Downloads/AppServerAgent-4.5.15.28231.zip .
-  cp ~/Downloads/AppD-Downloads/MachineAgent-4.5.14.2293.zip .
-  cp ~/Downloads/AppD-Downloads/awslambdamonitor-2.0.1.zip .
+  # Ensure Dockerfile includes these files
+  cp -n ~/Downloads/AppD-Downloads/AppServerAgent-4.5.15.28231.zip .
+  cp -n ~/Downloads/AppD-Downloads/MachineAgent-4.5.14.2293.zip .
+  cp -n ~/Downloads/AppD-Downloads/awslambdamonitor-2.0.1.zip .
   ls -al *.zip
   #
   docker build -t lambdalab1 .
@@ -174,5 +175,6 @@ else
   echo "  installMaven          Install Apache Maven"
   echo "  buildLambda           Compile and package the Lambda function"
   echo "  buildJavaApp          Compile and package the Java App"
-  echo "  dockerBuild           Build a Docker container for this lab"
+  echo "  dockerBuild           Build a Docker container,lambdalab1, for this lab"
+  echo "  dockerRun             Run the Docker container,lambdalab1"
 fi

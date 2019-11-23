@@ -54,10 +54,10 @@ export APPDYNAMICS_MACHINE_AGENT_DIR="MachineAgent"
 ##############################################################################
 # AppDynamics SaaS Controller
 # https://docs.appdynamics.com/display/PRO45/Set+Up+the+Serverless+APM+Environment
-export APPDYNAMICS_AGENT_ACCOUNT_NAME="REQUIRED_AAN"
+export APPDYNAMICS_AGENT_ACCOUNT_NAME="REQUIRED_AAAN"
 export APPDYNAMICS_GLOBAL_ACCOUNT_NAME="REQUIRED_AGNN"
 export APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY="REQUIRED_AAAAK"
-export APPDYNAMICS_CONTROLLER_HOST_NAME="REQUIRED_ACH"
+export APPDYNAMICS_CONTROLLER_HOST_NAME="REQUIRED_ACHN"
 export APPDYNAMICS_SERVERLESS_API_ENDPOINT="https://pdx-sls-agent-api.saas.appdynamics.com"
 export APPDYNAMICS_CONTROLLER_PORT="443"
 export APPDYNAMICS_CONTROLLER_SSL_ENABLED="true"

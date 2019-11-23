@@ -103,32 +103,37 @@ elif [ $cmd == "installMaven" ]; then
   # https://maven.apache.org/download.cgi
   _validateEnvironmentVars "Installing Apache Maven" \
     "MAVEN_APACHE_DOWNLOAD_MIRROR" "MAVEN_DOWNLOAD_FILE"
-  DOWNLOAD_URL=http://$MAVEN_APACHE_DOWNLOAD_MIRROR/maven/maven-3/3.6.2/binaries/$MAVEN_DOWNLOAD_FILE
-  echo "Downloading: $DOWNLOAD_URL"
-  curl  $DOWNLOAD_URL --output $MAVEN_DOWNLOAD_FILE
-  tar xf $MAVEN_DOWNLOAD_FILE
+  MVN_WHICH=`which mvn`
+  if [ "$MVN_WHICH" == "" ]; then
+    echo "Downloading Maven locally: $DOWNLOAD_URL"
+    # Maven is not installed - download locally into this directory
+    DOWNLOAD_URL=http://$MAVEN_APACHE_DOWNLOAD_MIRROR/maven/maven-3/3.6.2/binaries/$MAVEN_DOWNLOAD_FILE
+    curl  $DOWNLOAD_URL --output $MAVEN_DOWNLOAD_FILE
+    tar xf $MAVEN_DOWNLOAD_FILE
+  else
+    echo "Maven already installed: $MVN_WHICH"
+  fi
   # Find MAVEN_PATH
-  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin"; else MVN_BIN=`which mvn`; fi
-  echo "Maven is installed: $MVN_BIN"
+  #if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin"; else MVN_BIN=`which mvn`; fi
   #MAVEN_PATH=`pwd`"/$MAVEN_BASE_FILE/bin"
   #echo "set PATH to Maven"
   #echo ' export MAVEN_PATH=`pwd`/$MAVEN_BASE_FILE/bin'
   #echo ' export PATH=$MAVEN_PATH:$PATH'
 
 elif [ $cmd == "buildLambda" ]; then
+  _validateEnvironmentVars "Build Lambda Function" "MAVEN_BASE_FILE"
   # Find MAVEN_PATH
-  # if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
-  MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"
-  $MVN_BIN -f LambdaFunction/pom.xml clean install -U
-  $MVN_BIN -f LambdaFunction/pom.xml package shade:shade
+  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
+  #MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"
+  $MVN_BIN -f LambdaFunction/pom.xml clean package shade:shade
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
 elif [ $cmd == "buildJavaApp" ]; then
+  _validateEnvironmentVars "Build Java App" "MAVEN_BASE_FILE"
   # Find MAVEN_PATH
-  # if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
-  MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"
-  $MVN_BIN -f JavaApp/pom.xml clean install -U
-  $MVN_BIN -f JavaApp/pom.xml assembly:single
+  if [ "`which mvn`" == "" ]; then MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"; else MVN_BIN=`which mvn`; fi
+  #MVN_BIN=`pwd`"/$MAVEN_BASE_FILE/bin/mvn"
+  $MVN_BIN -f JavaApp/pom.xml clean package
   # Built LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar
 
 elif [ $cmd == "dockerBuild" ]; then
@@ -140,19 +145,14 @@ elif [ $cmd == "dockerBuild" ]; then
   #
   docker build -t lambdalab1 .
 
+elif [ $cmd == "dockerRun" ]; then
+  docker run -it lambdalab1
+
 elif [ $cmd == "test1" ]; then
   _test1 A B C
 
-elif [ $cmd == "run" ]; then
-  ITERATIONS=5
-  for I in $(seq 0 $((ITERATIONS))); do
-    _awsApi "TEST1"
-    sleep 30
-    _awsApi "TEST2"
-    sleep 30
-  done
-
 else
+  echo ""
   echo "Commands: "
   echo "  createFunction        Create an AWS Lambda function"
   echo "  listFunctions         List Lambda functions"
@@ -176,5 +176,3 @@ else
   echo "  buildJavaApp          Compile and package the Java App"
   echo "  dockerBuild           Build a Docker container for this lab"
 fi
-
-echo ""

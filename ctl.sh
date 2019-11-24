@@ -35,7 +35,8 @@ elif [ $cmd == "updateFunctionHandler" ]; then
   aws lambda update-function-configuration --function-name $AWS_LAMBDA_FUNCTION_NAME --handler $HANDLER
 
 elif [ $cmd == "deleteFunction" ]; then
-  aws lambda delete-function --function-name $AWS_LAMBDA_FUNCTION_NAME
+  FN_NAME=${2:-"$AWS_LAMBDA_FUNCTION_NAME"}
+  aws lambda delete-function --function-name $FN_NAME
   aws iam delete-role --role-name $AWS_LAMBDA_ROLE_NAME
 
 elif [ $cmd == "configureAppDynamicsLambda" ]; then

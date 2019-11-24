@@ -81,7 +81,9 @@ export APPDYNAMICS_EVENTS_SERVICE_ENDPOINT=""
 export APPDYNAMICS_SIM_ENABLED=true
 #
 ##############################################################################
-# Test HTTP POST payload data
+# Test HTTP POST payload JSON data
 export APPD_POST_DATA='{ "address": "302 2nd Street", "city": "San Francisco", "zip": "94107" }'
 #
-#
+##############################################################################
+# Docker
+export DOCKER_IMAGE_NAME="lambdalab1"

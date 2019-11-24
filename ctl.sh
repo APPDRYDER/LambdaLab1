@@ -70,6 +70,11 @@ elif [ $cmd == "testRestApiJavaApp" ]; then
 elif [ $cmd == "startJavaApp" ]; then
   _startJavaApp
 
+elif [ $cmd == "runJavaApp" ]; then
+  _stopJavaApp
+  nohup java -jar $JAVA_TEST_APP_JAR 18081 &
+  _tailLog 15 nohup.out
+
 elif [ $cmd == "stopJavaApp" ]; then
   _stopJavaApp
 
@@ -147,7 +152,13 @@ elif [ $cmd == "dockerBuild" ]; then
   docker build -t lambdalab1 .
 
 elif [ $cmd == "dockerRun" ]; then
-  docker run -it lambdalab1
+  docker run -d lambdalab1
+  docker ps
+
+elif [ $cmd == "dockerBash" ]; then
+  # Connect to the containe with bash
+  DOCKER_IMAGE_ID=`docker container ps --format '{{json .}}' | jq --arg SEARCH_STR $DOCKER_IMAGE_NAME -r '. | select(.Image | test($SEARCH_STR)) | .ID'`
+  docker exec -it $DOCKER_IMAGE_ID /bin/bash
 
 elif [ $cmd == "test1" ]; then
   _test1 A B C
@@ -159,6 +170,7 @@ else
   echo "  listFunctions         List Lambda functions"
   echo "  invokeFunction        Invoke a Lambda fuction directly"
   echo "  updateFunctionCode    Update a Lambda functions' code"
+  echo "  updateFunctionHandler Update Lambda function hanlder"
   echo "  deleteFunction        Delete a Lambda function"
   echo "  configureAppDynamicsLambda  Configure a Lambda function's AppD Environment Variables"
   echo "  createRestApi         Create an API Gateway REST API to trigger a Fuction"

@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.google.common.io.CharStreams;
 import org.json.JSONObject;
 
@@ -14,19 +16,21 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 
 public class TestFn1 implements RequestStreamHandler {
 	public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
-		String s1 = null;
-		Reader reader = new InputStreamReader(input);
-		s1 = CharStreams.toString(reader);
+		long startTime = System.currentTimeMillis();
+		String jStrSrc, jStr = null;
+		jStrSrc = CharStreams.toString(new InputStreamReader(input));
 		try {
-			JSONObject j = new JSONObject(s1);
-			System.out.println(String.format("JSON ok %s", s1));
+			JSONObject j = new JSONObject(jStrSrc);
 			if (j.has("error")) {
 				throw new java.lang.Error("Error");
 			}
+			j.put("fnname", context.getFunctionName());
+			j.put("timestamp", new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
+			j.put("duration", System.currentTimeMillis() - startTime);
+			jStr = j.toString();
 		} catch (Exception e) {
-			System.out.println(String.format("JSON error %s, %s", s1, e));
+			System.out.println(String.format("JSON error %s, %s", jStrSrc, e));
 		}
-		String s2 = s1.toUpperCase();
-		output.write(s2.getBytes());
+		output.write(jStr.getBytes());
 	} // handleRequest
 } // class TestFn1

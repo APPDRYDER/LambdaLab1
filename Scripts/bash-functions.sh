@@ -15,7 +15,10 @@ _validateEnvironmentVars() {
   VAR_LIST=("$@") # rebuild using all args
   #echo $VAR_LIST
   for i in "${VAR_LIST[@]}"; do
-     [ -z ${!i} ] && { echo "Environment variable not set: $i"; ERROR="1"; }
+    echo "$i=${!i}"
+    if [ -z ${!i} ] || [[ "${!i}" == REQUIRED_* ]]; then
+       echo "Environment variable not set: $i"; ERROR="1";
+    fi
   done
   [ "$ERROR" == "1" ] && { echo "Exiting"; exit 1; }
 }

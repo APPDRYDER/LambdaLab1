@@ -9,8 +9,8 @@
 #
 ##############################################################################
 # AWS Account
-#
-export AWS_REGION="us-west-1"
+# us-west-1 = N. California, us-west-2 = Oregon
+export AWS_REGION="us-west-2"
 export AWS_ACCOUNT_ID="REQUIRED_AAI"
 #
 ##############################################################################
@@ -21,6 +21,7 @@ export AWS_LAMBDA_RUNTIME="java8"
 export AWS_LAMBDA_HANDLER="lambda.TestFn1"
 export AWS_LAMBDA_ZIP_FILE="LambdaFunction/target/LambdaFunction-0.0.1-SNAPSHOT.jar"
 export AWS_LAMBDA_ROLE_NAME="APPD-LAMBDA-R1"
+export AWS_LAMBDA_TIMEOUT="30"
 #
 ##############################################################################
 # AWS API Gateway

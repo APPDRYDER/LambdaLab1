@@ -15,6 +15,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpMethod;
+import org.json.JSONObject;
 
 //ContentResponse res = client.GET("http://localhost:8080/");
 //System.out.println(res.getContentAsString());
@@ -29,7 +30,7 @@ public class Utils {
 			System.out.println("Requst Params Key: [" + key + "] - Val: [" + value + "]");
 		}
 	} // printParametermap
-	
+
 	public int getIntParameter(HttpServletRequest request, String name, int v) {
 		int result = v;
 		try {
@@ -39,7 +40,7 @@ public class Utils {
 		}
 		return result;
 	}
-	
+
 	public String getStringParameter(HttpServletRequest request, String name, String v) {
 		String result = v;
 		try {
@@ -50,8 +51,16 @@ public class Utils {
 		}
 		return result;
 	}
-	
-	
+
+	public String getJSONStringParameter(JSONObject j, String field, String v) {
+		String result = v;
+		if (j.has(field)) {
+			result = v;
+		}
+		result = (result != null) ? result : v;
+		return result;
+	}
+
 	public int getIntParameter(String value, int v) {
 		int result = v;
 		try {
@@ -61,11 +70,11 @@ public class Utils {
 		}
 		return result;
 	}
-	
+
 	public int getArgInt(String[] args, int argN, int defaultValue) {
 		return (args.length > argN) ? getIntParameter(args[argN], defaultValue) : defaultValue;
 	}
-	
+
 	public String getArgStr(String[] args, int argN, String defaultValue) {
 		return (args.length > argN) ? args[argN] : defaultValue;
 	}
@@ -77,7 +86,7 @@ public class Utils {
 			System.out.println(String.format("Exception: %s", e));
 		}
 	}
-	
+
 	public void printHeaders(org.eclipse.jetty.server.Request r) {
 		System.out.println(r.getMethod() + " " + r.getContextPath());
 		Enumeration<String> headerNames = r.getHeaderNames();
@@ -92,11 +101,8 @@ public class Utils {
 		System.out.println("PostMessage: " + async + " " + message);
 		try {
 			if (async) {
-				ContentResponse r = client.newRequest(uri)
-						.method(HttpMethod.POST)
-						.content(new StringContentProvider(message), "text/plain")
-						.timeout(30, TimeUnit.SECONDS)
-						.send();
+				ContentResponse r = client.newRequest(uri).method(HttpMethod.POST)
+						.content(new StringContentProvider(message), "text/plain").timeout(30, TimeUnit.SECONDS).send();
 			} else {
 				org.eclipse.jetty.client.api.Request r = client.POST(uri);
 				r.content(new StringContentProvider(message), "text/plain");
@@ -139,7 +145,8 @@ public class Utils {
 
 	} // PostMessageTask
 
-	public Timer postMessageScheduler(HttpClient client, String uri, String message, long delay, long period, boolean async) {
+	public Timer postMessageScheduler(HttpClient client, String uri, String message, long delay, long period,
+			boolean async) {
 		Timer t = new Timer();
 		t.schedule(new PostMessageTask(client, uri, message, async), delay, period);
 		return t;

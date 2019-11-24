@@ -16,18 +16,13 @@ _awsLambdaCreateFunction() {
   _validateEnvironmentVars "AWS Create Lambda Function" \
     "AWS_LAMBDA_ROLE_NAME" "AWS_LAMBDA_FUNCTION_NAME" "AWS_LAMBDA_RUNTIME" "AWS_LAMBDA_HANDLER" "AWS_LAMBDA_ZIP_FILE"
 
-  AWS_ROLE_POLICY_DOC_FILE="AWSLambdaBasicExecutionRole.json"
-
-  # Create the AWS Role Policy Document File
-  echo '{ "Version": "2012-10-17",
-          "Statement": [ {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": { "Service": "lambda.amazonaws.com" } } ] }' > $AWS_ROLE_POLICY_DOC_FILE
-
   # Create the role for lambda functions
-  aws iam create-role --role-name $AWS_LAMBDA_ROLE_NAME --assume-role-policy-document "file://$AWS_ROLE_POLICY_DOC_FILE"
-  sleep 15 # Allow time for role to create
+  AWS_ROLE_POLICY_DOC='{ "Version": "2012-10-17",
+                         "Statement": [ {
+                           "Action": "sts:AssumeRole",
+                           "Effect": "Allow",
+                           "Principal": { "Service": "lambda.amazonaws.com" } } ] }'
+  aws iam create-role --role-name $AWS_LAMBDA_ROLE_NAME --assume-role-policy-document "$AWS_ROLE_POLICY_DOC"
 
   # Get the role ARN, need to wait for role to create
   AWS_ROLE_ARN=""
@@ -47,8 +42,9 @@ _awsLambdaCreateFunction() {
     --function-name $AWS_LAMBDA_FUNCTION_NAME \
     --runtime $AWS_LAMBDA_RUNTIME \
     --role $AWS_ROLE_ARN \
-    --timeout 30 \
+    --timeout $AWS_LAMBDA_TIMEOUT \
     --publish \
+    --region $AWS_REGION \
     --handler $AWS_LAMBDA_HANDLER \
     --zip-file "fileb://$AWS_LAMBDA_ZIP_FILE"
 
@@ -56,8 +52,7 @@ _awsLambdaCreateFunction() {
   AWS_FUNCTION_ARN=`aws lambda get-function --function-name $AWS_LAMBDA_FUNCTION_NAME | jq -r '.Configuration | .FunctionArn'`
 
   echo "Function Created: $AWS_LAMBDA_FUNCTION_NAME ARN: $AWS_FUNCTION_ARN"
-  aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler}  ]'
-} # _awsCreateFunction
+} # _awsLambdaCreateFunction
 
 
 ##############################################################
@@ -89,13 +84,14 @@ _awsLambdaConfigureAppDynamics() {
 _awsCreateRestAPI() {
   # Create an AWS API Gateway API that invoeks the Lambda Function
   _validateEnvironmentVars "AWS Configure AWS API Gateway" \
-    "AWS_API_NAME" "AWS_REGION" "AWS_API_PATH" "AWS_API_PATH" "AWS_API_STAGE" "AWS_LAMBDA_FUNCTION_NAME"
+    "AWS_API_NAME" "AWS_REGION" "AWS_ACCOUNT_ID" "AWS_API_PATH" "AWS_API_STAGE" "AWS_LAMBDA_FUNCTION_NAME"
+
 
   # Create API gateway
   aws apigateway create-rest-api --name $AWS_API_NAME --region $AWS_REGION
 
   # Get the Rest API ID and the API Parent / Root ID
-  AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
+  AWS_REST_API_ID=`aws apigateway get-rest-apis --region $AWS_REGION  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
   AWS_API_PARENT_ID=`aws apigateway get-resources --rest-api-id $AWS_REST_API_ID | jq -r '.items[] | .id'`
   echo "AWS API ID $AWS_REST_API_ID PARENT ID $AWS_API_PARENT_ID"
 
@@ -149,7 +145,7 @@ _awsCreateRestAPI() {
     --action lambda:InvokeFunction \
     --principal apigateway.amazonaws.com \
     --source-arn "arn:aws:execute-api:$AWS_REGION:$AWS_ACCOUNT_ID:$AWS_REST_API_ID/$AWS_API_STAGE/$AWS_API_HTTP_METHOD/$AWS_API_PATH"
-}
+} # _awsCreateRestAPI
 
 _awsTestPostApiCurl() {
   AWS_REST_API_ID=`aws apigateway get-rest-apis  | jq --arg SEARCH_STR $AWS_API_NAME -r '.items[] | select(.name | test($SEARCH_STR)) |  .id'`
@@ -158,7 +154,7 @@ _awsTestPostApiCurl() {
        -H "x-api-key: $API_KEY" \
        -H "Content-Type: application/json" \
        "https://$AWS_REST_API_ID.execute-api.$AWS_REGION.amazonaws.com/$AWS_API_STAGE/$AWS_API_PATH"
-}
+} # _awsTestPostApiCurl
 
 _awsTestPostApiCurlError() {
    # Trigger the Lambda function to throw an Exception
@@ -175,4 +171,4 @@ _awsTestPostApiCurlError() {
          "https://$AWS_REST_API_ID.execute-api.$AWS_REGION.amazonaws.com/$AWS_API_STAGE/$AWS_API_PATH"
     sleep $INTERVAL_SEC
   done
-}
+} # _awsTestPostApiCurlError

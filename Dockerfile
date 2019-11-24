@@ -19,5 +19,5 @@ COPY LambdaFunction   $SW_DIR/LambdaFunction
 COPY AppServerAgent-4.5.15.28231.zip     $SW_DIR
 COPY MachineAgent-4.5.14.2293.zip        $SW_DIR
 COPY awslambdamonitor-2.0.1.zip          $SW_DIR
-# Start the container
-CMD /bin/bash
+# Start the container, keep open
+CMD sleep 2593200 ; # Keep Container Running

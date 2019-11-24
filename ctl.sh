@@ -149,10 +149,10 @@ elif [ $cmd == "dockerBuild" ]; then
   cp -n ~/Downloads/AppD-Downloads/awslambdamonitor-2.0.1.zip .
   ls -al *.zip
   #
-  docker build -t lambdalab1 .
+  docker build -t $DOCKER_IMAGE_NAME .
 
 elif [ $cmd == "dockerRun" ]; then
-  docker run -d lambdalab1
+  docker run -d $DOCKER_IMAGE_NAME
   docker ps
 
 elif [ $cmd == "dockerBash" ]; then
@@ -187,6 +187,7 @@ else
   echo "  installMaven          Install Apache Maven"
   echo "  buildLambda           Compile and package the Lambda function"
   echo "  buildJavaApp          Compile and package the Java App"
-  echo "  dockerBuild           Build a Docker container,lambdalab1, for this lab"
-  echo "  dockerRun             Run the Docker container,lambdalab1"
+  echo "  dockerBuild           Build a Docker container, $DOCKER_IMAGE_NAME, for this lab"
+  echo "  dockerRun             Run the Docker container, $DOCKER_IMAGE_NAME"
+  echo "  dockerBash            Connect to Docker container, $DOCKER_IMAGE_NAME, using bash"
 fi

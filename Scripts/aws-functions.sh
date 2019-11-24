@@ -32,6 +32,7 @@ _awsLambdaCreateFunction() {
   # Get the role ARN, need to wait for role to create
   AWS_ROLE_ARN=""
   while [ "$AWS_ROLE_ARN" == "" ]; do
+    echo "Waiting for role to create: $AWS_LAMBDA_ROLE_NAME"
     sleep 5
     AWS_ROLE_ARN=`aws iam get-role --role-name $AWS_LAMBDA_ROLE_NAME | jq -r '.Role | .Arn'`
   done
@@ -131,6 +132,7 @@ _awsCreateRestAPI() {
   aws apigateway create-deployment --rest-api-id $AWS_REST_API_ID --stage-name $AWS_API_STAGE
 
   # Remove previous policy statement IDs - Ignore errors
+  echo "Ignore Errors............."
   aws lambda remove-permission --function-name $AWS_LAMBDA_FUNCTION_NAME --statement-id "apigateway-s1-"$AWS_LAMBDA_FUNCTION_NAME
   aws lambda remove-permission --function-name $AWS_LAMBDA_FUNCTION_NAME --statement-id "apigateway-s2-"$AWS_LAMBDA_FUNCTION_NAME
 

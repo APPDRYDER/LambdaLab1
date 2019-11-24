@@ -64,7 +64,7 @@ _awsLambdaConfigureAppDynamics() {
     "APPDYNAMICS_CONTROLLER_HOST_NAME" "APPDYNAMICS_CONTROLLER_PORT" "APPDYNAMICS_SERVERLESS_API_ENDPOINT" \
     "APPDYNAMICS_LOG_LEVEL" "APPDYNAMICS_TIER_NAME"
 
-  # Note the transaction from Lambda enviroment var to AppD environment var
+  # Note the translation from Lambda enviroment var to AppD environment var
   PARAMS="{\"Variables\":
               {
                 \"APPDYNAMICS_ACCOUNT_NAME\":\"$APPDYNAMICS_AGENT_ACCOUNT_NAME\",

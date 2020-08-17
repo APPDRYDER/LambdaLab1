@@ -25,7 +25,8 @@ elif [ $cmd == "listFunctions" ]; then
   aws lambda list-functions | jq -r '[.Functions[] | {FunctionName, Runtime, Handler, FunctionArn}  ]'
 
 elif [ $cmd == "invokeFunction" ]; then
-   aws lambda invoke --function-name $AWS_LAMBDA_FUNCTION_NAME --payload "$APPD_POST_DATA" /dev/stdout
+  POST_DATA_B64=$(echo -n $APPD_POST_DATA | base64)
+   aws lambda invoke --function-name $AWS_LAMBDA_FUNCTION_NAME --payload "$POST_DATA_B64" /dev/stdout
 
 elif [ $cmd == "updateFunctionCode" ]; then
   aws lambda update-function-code --function-name $AWS_LAMBDA_FUNCTION_NAME --zip-file fileb://$AWS_LAMBDA_ZIP_FILE

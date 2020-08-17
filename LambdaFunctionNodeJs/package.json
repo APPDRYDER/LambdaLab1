@@ -1,0 +1,14 @@
+{
+  "name": "lambdafunctionnodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lambda-nodejs-fn1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "appdynamics-lambda-tracer": "^20.3.178"
+  }
+}
